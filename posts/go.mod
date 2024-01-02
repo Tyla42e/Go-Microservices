@@ -1,4 +1,4 @@
-module example.com/server
+module example.com/posts
 
 go 1.21.2
 
