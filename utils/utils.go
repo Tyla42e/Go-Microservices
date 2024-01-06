@@ -1,8 +1,12 @@
 package utils
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"net/http"
 )
 
 func GenerateID(size int) (string, error) {
@@ -14,4 +18,16 @@ func GenerateID(size int) (string, error) {
 	}
 	return hex.EncodeToString(id), nil
 
+}
+
+func CreateHTTPRequest(method, uri, port, endPoint string, payload interface{}) (*http.Request, error) {
+
+	url := fmt.Sprintf("%s:%s/%s", uri, port, endPoint)
+	reqBodyBytes := new(bytes.Buffer)
+	json.NewEncoder(reqBodyBytes).Encode(payload)
+	return http.NewRequest(method, url, bytes.NewBuffer(reqBodyBytes.Bytes()))
+}
+
+func DispatchRequest(request *http.Request) (*http.Response, error) {
+	return http.DefaultClient.Do(request)
 }
