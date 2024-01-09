@@ -1,6 +1,8 @@
 package models
 
 import (
+	"errors"
+	"slices"
 	"time"
 )
 
@@ -29,4 +31,24 @@ func AddPost(postId string, c Comment) {
 	p := posts[postId]
 	p.Comments = append(p.Comments, c)
 	posts[postId] = p
+}
+
+func UpdateComment(c Comment, postId string) error {
+
+	post, ok := posts[postId]
+
+	if !ok {
+		return errors.New("Comment not found")
+	}
+
+	//comments := post.Comments
+	idx := slices.IndexFunc(post.Comments, func(comment Comment) bool { return comment.ID == c.ID })
+
+	if idx == -1 {
+		return errors.New("Comment not found")
+	}
+
+	post.Comments[idx] = c
+	posts[postId] = post
+	return nil
 }

@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"errors"
+	"slices"
+	"time"
+)
 
 type Comment struct {
 	ID      string    `json:"id"`
@@ -23,4 +27,22 @@ func GetAllComments(postId string) []Comment {
 		comments = []Comment{}
 	}
 	return comments
+}
+
+func UpdateComment(c Comment, postId string) error {
+
+	comments, ok := comments[postId]
+	if !ok {
+		return errors.New("Comment not found")
+	}
+
+	idx := slices.IndexFunc(comments, func(comment Comment) bool { return comment.ID == c.ID })
+
+	if idx == -1 {
+		return errors.New("Comment not found")
+	}
+
+	comments[idx] = c
+
+	return nil
 }

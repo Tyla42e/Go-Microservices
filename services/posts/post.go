@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"time"
 
 	"example.com/eventtypes"
@@ -10,10 +11,27 @@ import (
 	"example.com/utils"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
+	"github.com/rs/zerolog"
 )
 
+var logger zerolog.Logger
+
 func main() {
+
+	file, err := os.OpenFile(
+		"../services.log",
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
+		0664,
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	defer file.Close()
+
+	gin.DefaultWriter = io.MultiWriter(file)
+	logger = zerolog.New(file).With().Caller().Timestamp().Logger()
+
 	server := gin.Default()
 
 	server.Use(cors.Default())
@@ -32,7 +50,7 @@ func addPost(context *gin.Context) {
 	var post models.Post
 	err := context.ShouldBindJSON(&post)
 
-	fmt.Printf("Post: %+v\n", post)
+	logger.Info().Msgf("Post: %+v", post)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse data"})
 		return
@@ -54,17 +72,17 @@ func addPost(context *gin.Context) {
 	event.EventType = eventtypes.PostCreated.String()
 	event.Payload = post
 
-	fmt.Printf("Sending event: %+v\n", event)
+	logger.Info().Msgf("Sending event: %+v", event)
 	req, err := utils.CreateHTTPRequest("POST", "http://localhost", "4005", "events", event)
 
 	if err != nil {
-		log.Error().Err(err).Msg("Error Creatinmg Request")
+		logger.Error().Err(err).Msg("Error Creatinmg Request")
 	} else {
 		res, err := utils.DispatchRequest(req)
 		if err != nil {
-			log.Error().Err(err).Msg(res.Status)
+			logger.Error().Err(err).Msg(res.Status)
 		} else {
-			log.Info().Msg(res.Status)
+			logger.Info().Msg(res.Status)
 		}
 	}
 
@@ -79,6 +97,6 @@ func handleEvent(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse data"})
 		return
 	}
-	log.Info().Msgf("Recieved Event: %+v", event.EventType)
+	logger.Info().Msgf("Recieved Event: %+v", event.EventType)
 	context.JSON(http.StatusCreated, gin.H{"message": "OK"})
 }

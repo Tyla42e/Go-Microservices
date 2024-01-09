@@ -6,6 +6,7 @@ const (
 	PostCreated EventType = iota
 	CommentCreated
 	CommentUpdated
+	CommentModerated
 )
 
 func (e EventType) String() string {
@@ -16,6 +17,8 @@ func (e EventType) String() string {
 		return "CommentCreated"
 	case CommentUpdated:
 		return "CommentUpdated"
+	case CommentModerated:
+		return "CommentModerated"
 	}
 	return "Unknown eventtype"
 }

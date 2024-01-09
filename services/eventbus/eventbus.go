@@ -3,15 +3,33 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
+	"os"
 
-	"github.com/rs/zerolog/log"
+	"github.com/rs/zerolog"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
+var logger zerolog.Logger
+
 func main() {
+
+	file, err := os.OpenFile(
+		"../services.log",
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
+		0664,
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	defer file.Close()
+
+	gin.DefaultWriter = io.MultiWriter(file)
+	logger = zerolog.New(file).With().Caller().Timestamp().Logger()
 	server := gin.Default()
 
 	server.Use(cors.Default())
@@ -32,7 +50,9 @@ func handleEvents(context *gin.Context) {
 	forwardRequest("POST", "http://localhost:4000/events", string(data[:]))
 	forwardRequest("POST", "http://localhost:4001/events", string(data[:]))
 	forwardRequest("POST", "http://localhost:4002/events", string(data[:]))
-	//forwardRequest("POST", "http://localhost:4003/events", event)
+	forwardRequest("POST", "http://localhost:4003/events", string(data[:]))
+
+	context.JSON(http.StatusCreated, gin.H{"message": "OK"})
 }
 
 func forwardRequest(method string, url string, data string) {
@@ -40,16 +60,18 @@ func forwardRequest(method string, url string, data string) {
 	json.NewEncoder(reqBodyBytes).Encode(data)
 	req, err := http.NewRequest(method, url, bytes.NewBuffer([]byte(data)))
 
+	logger.Info().Msgf("Sending request to %s", url)
+	logger.Info().Msgf("Data:%+v", data)
 	if err != nil {
-		log.Error().Err(err).Msg("Error Creatinmg Request")
+		logger.Error().Err(err).Msg("Error Creatinmg Request")
 	} else {
-		log.Info().Msg("Requested Created")
+		logger.Info().Msg("Requested Created")
 	}
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Error().Err(err).Msg(res.Status)
+		logger.Error().Err(err).Msg(res.Status)
 	} else {
-		log.Info().Msg(res.Status)
+		logger.Info().Msg(res.Status)
 	}
 }
