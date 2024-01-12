@@ -23,8 +23,12 @@ func GenerateID(size int) (string, error) {
 func CreateHTTPRequest(method, uri, port, endPoint string, payload interface{}) (*http.Request, error) {
 
 	url := fmt.Sprintf("%s:%s/%s", uri, port, endPoint)
+
 	reqBodyBytes := new(bytes.Buffer)
 	json.NewEncoder(reqBodyBytes).Encode(payload)
+
+	fmt.Printf("Utils: Sending request to %s\n", url)
+	fmt.Printf("Utils: Request Data\n%+v\n", reqBodyBytes)
 	return http.NewRequest(method, url, bytes.NewBuffer(reqBodyBytes.Bytes()))
 }
 

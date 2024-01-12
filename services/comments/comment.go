@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"net/http"
 	"os"
 	"time"
@@ -19,7 +18,7 @@ var logger zerolog.Logger
 func main() {
 
 	file, err := os.OpenFile(
-		"../services.log",
+		"../logs/comment.log",
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 		0664,
 	)
@@ -29,10 +28,9 @@ func main() {
 
 	defer file.Close()
 
-	gin.DefaultWriter = io.MultiWriter(file)
+	//gin.DefaultWriter = io.MultiWriter(file)
 	logger = zerolog.New(file).With().Caller().Timestamp().Logger()
 
-	logger.Info().Msg("Starting Comment Service")
 	server := gin.Default()
 
 	server.Use(cors.Default())

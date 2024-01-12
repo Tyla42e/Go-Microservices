@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -20,7 +19,7 @@ var logger zerolog.Logger
 func main() {
 
 	file, err := os.OpenFile(
-		"../services.log",
+		"../logs/moderation.log",
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 		0664,
 	)
@@ -30,7 +29,7 @@ func main() {
 
 	defer file.Close()
 
-	gin.DefaultWriter = io.MultiWriter(file)
+	//Sgin.DefaultWriter = io.MultiWriter(file)
 	logger = zerolog.New(file).With().Caller().Timestamp().Logger()
 	server := gin.Default()
 

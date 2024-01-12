@@ -21,3 +21,5 @@
 go.work
 
 client/node-modules
+.vscode/launch.json
+data.json

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"io"
+	"net"
 	"net/http"
 	"os"
 
@@ -24,7 +25,7 @@ var logger zerolog.Logger
 func main() {
 
 	file, err := os.OpenFile(
-		"../services.log",
+		"../logs/query.log",
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 		0664,
 	)
@@ -34,7 +35,7 @@ func main() {
 
 	defer file.Close()
 
-	gin.DefaultWriter = io.MultiWriter(file)
+	//gin.DefaultWriter = io.MultiWriter(file)
 	logger = zerolog.New(file).With().Caller().Timestamp().Logger()
 
 	server := gin.Default()
@@ -43,7 +44,48 @@ func main() {
 
 	server.POST("/events", handleEvent)
 	server.GET("/posts", getAllPosts)
-	server.Run(":4002")
+
+	listener, err := net.Listen("tcp", ":4002")
+	if err != nil {
+		logger.Fatal().Msg("Failed to creat listener")
+	}
+
+	go func() {
+		err = server.RunListener(listener)
+		logger.WithLevel(zerolog.FatalLevel).Err(err).Msg("Failed to start server")
+	}()
+
+	processMissedEvents()
+
+	select {}
+}
+
+func processMissedEvents() {
+
+	var missedEvents = []models.Event{}
+
+	resp, err := http.Get("http://localhost:4005/events")
+
+	if err != nil {
+		logger.Error().Err(err)
+		return
+	} else {
+		defer resp.Body.Close()
+		if resp.StatusCode == http.StatusOK {
+			bodyBytes, err := io.ReadAll(resp.Body)
+			if err != nil {
+				logger.Fatal().Err(err)
+			}
+			bodyString := string(bodyBytes)
+
+			err = json.Unmarshal([]byte(bodyString), &missedEvents)
+
+			for _, event := range missedEvents {
+				logger.Info().Msgf("Processing Event: %+v", event)
+				processEvent(event)
+			}
+		}
+	}
 }
 
 func handleEvent(context *gin.Context) {
@@ -51,19 +93,23 @@ func handleEvent(context *gin.Context) {
 	context.ShouldBindJSON(&event)
 	logger.Info().Msgf("event: %+v", event)
 	logger.Info().Msgf("Type: %s", event.Type)
+
+	processEvent(event)
+
+	context.JSON(http.StatusCreated, gin.H{"message": "OK"})
+}
+
+func processEvent(event models.Event) {
 	if event.Type != eventtypes.CommentModerated.String() {
 		m[event.Type].(func(models.Event))(event)
 	}
-	context.JSON(http.StatusCreated, gin.H{"message": "OK"})
 }
 
 func getAllPosts(context *gin.Context) {
 	logger.Info().Msg("getAllPosts")
 	data := []*models.Post{}
 	posts := models.GetAllPosts()
-	for _, v := range posts {
-		var post *models.Post
-		post = v
+	for _, post := range posts {
 		data = append(data, post)
 	}
 	context.JSON(http.StatusOK, data)

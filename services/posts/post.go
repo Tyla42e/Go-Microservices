@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"net/http"
 	"os"
 	"time"
@@ -19,7 +18,7 @@ var logger zerolog.Logger
 func main() {
 
 	file, err := os.OpenFile(
-		"../services.log",
+		"../logs/posts.log",
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 		0664,
 	)
@@ -29,7 +28,7 @@ func main() {
 
 	defer file.Close()
 
-	gin.DefaultWriter = io.MultiWriter(file)
+	//Sgin.DefaultWriter = io.MultiWriter(file)
 	logger = zerolog.New(file).With().Caller().Timestamp().Logger()
 
 	server := gin.Default()
@@ -76,7 +75,7 @@ func addPost(context *gin.Context) {
 	req, err := utils.CreateHTTPRequest("POST", "http://localhost", "4005", "events", event)
 
 	if err != nil {
-		logger.Error().Err(err).Msg("Error Creatinmg Request")
+		logger.Error().Err(err).Msg("Error Creating Request")
 	} else {
 		res, err := utils.DispatchRequest(req)
 		if err != nil {
