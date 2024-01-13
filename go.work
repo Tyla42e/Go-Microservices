@@ -1,0 +1,11 @@
+go 1.21.5
+
+use (
+	./eventtypes
+	./services/comments
+	./services/eventbus
+	./services/moderation
+	./services/posts
+	./services/query
+	./utils
+)
