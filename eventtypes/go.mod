@@ -1,3 +1,4 @@
-module github.com/Tyla42e/Go-Microservices/eventtypes
+module example.com/eventtypes
 
-go 1.21.5
+
+go 1.21.2

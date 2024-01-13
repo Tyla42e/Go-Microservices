@@ -1,4 +1,4 @@
-module github.com/Tyla42e/Go-Microservices/services/eventbus
+module example.com/eventbus
 
 go 1.21.5
 

@@ -1,3 +1,3 @@
-module github.com/Tyla42e/Go-Microservices/utils
+module example.com/utils
 
-go 1.21.5
+go 1.21.2

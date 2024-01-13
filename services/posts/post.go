@@ -5,9 +5,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/Tyla42e/Go-Microservices/eventtypes"
-	"github.com/Tyla42e/Go-Microservices/services/posts/models"
-	"github.com/Tyla42e/Go-Microservices/utils"
+	"example.com/eventtypes"
+	"example.com/posts/models"
+	"example.com/utils"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
@@ -77,13 +77,9 @@ func addPost(context *gin.Context) {
 	if err != nil {
 		logger.Error().Err(err).Msg("Error Creating Request")
 	} else {
-		res, err := http.DefaultClient.Do(req)
+		res, err := utils.DispatchRequest(req)
 		if err != nil {
-			if res != nil {
-				logger.Error().Err(err).Msg(res.Status)
-			} else {
-				logger.Error().Err(err).Msg("Unable to connect to EventBus")
-			}
+			logger.Error().Err(err).Msg(res.Status)
 		} else {
 			logger.Info().Msg(res.Status)
 		}

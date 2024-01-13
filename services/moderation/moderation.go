@@ -5,9 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Tyla42e/Go-Microservices/eventtypes"
-	"github.com/Tyla42e/Go-Microservices/services/comments/models"
-	"github.com/Tyla42e/Go-Microservices/utils"
+	"example.com/comments/models"
+	"example.com/eventtypes"
+	"example.com/utils"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"

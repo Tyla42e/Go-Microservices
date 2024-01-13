@@ -27,8 +27,8 @@ func CreateHTTPRequest(method, uri, port, endPoint string, payload interface{}) 
 	reqBodyBytes := new(bytes.Buffer)
 	json.NewEncoder(reqBodyBytes).Encode(payload)
 
-	//fmt.Printf("Utils: Sending request to %s\n", url)
-	//fmt.Printf("Utils: Request Data\n%+v\n", reqBodyBytes)
+	fmt.Printf("Utils: Sending request to %s\n", url)
+	fmt.Printf("Utils: Request Data\n%+v\n", reqBodyBytes)
 	return http.NewRequest(method, url, bytes.NewBuffer(reqBodyBytes.Bytes()))
 }
 

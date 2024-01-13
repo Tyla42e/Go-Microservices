@@ -1,2 +1,2 @@
-module github.com/Tyla42e/Go-Microservices/services/moderation
+module example.com/moderation
 go 1.21.2
