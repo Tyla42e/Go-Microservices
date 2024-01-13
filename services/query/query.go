@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"os"
 
-	"example.com/eventtypes"
 	"example.com/query/models"
+	"github.com/Tyla42e/Go-Microservices/eventtypes"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
