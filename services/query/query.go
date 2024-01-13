@@ -3,11 +3,11 @@ package main
 import (
 	"encoding/json"
 	"io"
+	"models/models"
 	"net"
 	"net/http"
 	"os"
 
-	"example.com/query/models"
 	"github.com/Tyla42e/Go-Microservices/eventtypes"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

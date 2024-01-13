@@ -6,11 +6,10 @@ import (
 	"net/http"
 	"os"
 
-	"example.com/eventbus/models"
-	"github.com/rs/zerolog"
-
+	"github.com/Tyla42e/Go-Microservices/services/eventbus/models"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 )
 
 var logger zerolog.Logger
