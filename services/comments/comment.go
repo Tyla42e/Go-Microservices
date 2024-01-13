@@ -5,8 +5,8 @@ import (
 	"os"
 	"time"
 
-	"example.com/comments/models"
 	"github.com/Tyla42e/Go-Microservices/eventtypes"
+	"github.com/Tyla42e/Go-Microservices/services/comments/models"
 	"github.com/Tyla42e/Go-Microservices/utils"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
