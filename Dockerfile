@@ -4,16 +4,18 @@
 ## Build the application from source
 ##
 
-FROM golang:1.19 AS build-stage
+FROM golang:1.21 AS build-stage
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+#COPY go.mod go.sum ./
+
+
+COPY ./ ./
+RUN cd /app/server
 RUN go mod download
 
-COPY *.go ./
-
-RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping
+RUN CGO_ENABLED=0 GOOS=linux go build -C /app/server  -o ./blog
 
 ##
 ## Run the tests in the container
@@ -30,10 +32,10 @@ FROM gcr.io/distroless/base-debian11 AS build-release-stage
 
 WORKDIR /
 
-COPY --from=build-stage /docker-gs-ping /docker-gs-ping
+COPY --from=build-stage /app/server/blog ./blog
 
-EXPOSE 8080
+EXPOSE 8000 
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["/docker-gs-ping"]
+ENTRYPOINT ["./blog"]

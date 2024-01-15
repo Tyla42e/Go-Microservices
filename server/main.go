@@ -14,14 +14,29 @@ import (
 func main() {
 	server := gin.Default()
 
+	fmt.Println("Configuring CORS")
+	// server.Use(cors.New(cors.Config{
+	// 	//AllowOrigins:    []string{"http://localhost:8000", "http://127.0.0.1:8000"},
+	// 	AllowMethods:    []string{"PUT", "POST", "GET", "OPTIONS", "DELETE"},
+	// 	AllowHeaders:    []string{"Origin"},
+	// 	AllowAllOrigins: true,
+	// 	//ExposeHeaders:    []string{"Content-Length"},
+	// 	AllowCredentials: true,
+	// 	MaxAge:           12 * time.Hour,
+	// }))
+
 	server.Use(cors.Default())
 
+	server.GET("/", func(context *gin.Context) {
+		context.JSON(http.StatusOK, gin.H{"data": "Hello World !"})
+	})
 	server.GET("/posts", getPosts)
 	server.POST("/posts", addPost)
 	server.GET("/posts/:id/comments", getComments)
 	server.POST("/posts/:id/comments", addComment)
 
-	server.Run(":8080")
+	fmt.Printf("Starting Server")
+	server.Run(":8000")
 }
 
 func getPosts(context *gin.Context) {
