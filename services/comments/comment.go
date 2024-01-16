@@ -18,7 +18,7 @@ var logger zerolog.Logger
 func main() {
 
 	file, err := os.OpenFile(
-		"../logs/comment.log",
+		"/var/log/comment.log",
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 		0664,
 	)
@@ -29,7 +29,8 @@ func main() {
 	defer file.Close()
 
 	//gin.DefaultWriter = io.MultiWriter(file)
-	logger = zerolog.New(file).With().Caller().Timestamp().Logger()
+	//logger = zerolog.New(file).With().Caller().Timestamp().Logger()
+	logger = zerolog.New(os.Stdout).With().Caller().Timestamp().Logger()
 
 	server := gin.Default()
 
@@ -81,9 +82,13 @@ func addComment(context *gin.Context) {
 	if err != nil {
 		logger.Error().Err(err).Msg("Error Creating Request")
 	} else {
-		res, err := utils.DispatchRequest(req)
+		res, err := http.DefaultClient.Do(req)
 		if err != nil {
-			logger.Error().Err(err).Msg(res.Status)
+			if res != nil {
+				logger.Error().Err(err).Msg(res.Status)
+			} else {
+				logger.Error().Err(err).Msg("Unable to connect to http://localhost:4005/events")
+			}
 		} else {
 			logger.Info().Msg(res.Status)
 		}
