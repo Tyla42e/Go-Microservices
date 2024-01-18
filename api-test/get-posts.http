@@ -1,1 +1,1 @@
-GET http://localhost:4000/posts
+GET http://posts.com:30288/posts

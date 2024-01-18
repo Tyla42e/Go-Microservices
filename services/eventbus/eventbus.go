@@ -62,10 +62,10 @@ func handleEvents(context *gin.Context) {
 	event.Save()
 
 	logger.Info().Msg("Forwarding Requests")
-	forwardRequest("POST", "http://localhost:4000/events", event)
-	forwardRequest("POST", "http://localhost:4001/events", event)
-	forwardRequest("POST", "http://localhost:4002/events", event)
-	forwardRequest("POST", "http://localhost:4003/events", event)
+	forwardRequest("POST", "http://post-clusterip-srv:4000/events", event)
+	forwardRequest("POST", "http://comments-clusterip-srv:4001/events", event)
+	forwardRequest("POST", "http://query-clusterip-srv:4002/events", event)
+	forwardRequest("POST", "http://moderation-clusterip-srv:4003/events", event)
 
 	context.JSON(http.StatusCreated, gin.H{"message": "OK"})
 }

@@ -8,8 +8,6 @@ FROM golang:1.21 AS build-stage
 
 WORKDIR /app
 
-#RUN ls -ls  ./
-
 COPY ./utils/ ./utils
 COPY ./eventtypes ./eventtypes
 COPY ./services/comments ./services/comments
@@ -17,9 +15,8 @@ COPY ./services/moderation ./services/moderation
 
 RUN cd /app/services/moderation && go mod download
 
-RUN ls -ls 
 RUN CGO_ENABLED=0 GOOS=linux go build -C ./services/moderation .
-#RUN ls -ls  ./services/commentsdebian
+
 ##
 ## Run the tests in the container
 ##
@@ -38,9 +35,4 @@ WORKDIR /
 COPY --from=build-stage /app/services/moderation .
 
 EXPOSE 4003
-
-#RUN ls -ls 
-#USER nonroot:nonroot
-
-#RUN chmod +x ./posts
 ENTRYPOINT ["./moderation"]

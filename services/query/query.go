@@ -65,7 +65,7 @@ func processMissedEvents() {
 
 	var missedEvents = []models.Event{}
 
-	resp, err := http.Get("http://localhost:4005/events")
+	resp, err := http.Get("http://eventbus-srv:4005/events")
 
 	if err != nil {
 		logger.Error().Err(err)

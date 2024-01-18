@@ -34,9 +34,4 @@ WORKDIR /
 COPY --from=build-stage /app/services/query .
 
 EXPOSE 4002
-
-#RUN ls -ls 
-#USER nonroot:nonroot
-
-#RUN chmod +x ./posts
 ENTRYPOINT ["./query"]

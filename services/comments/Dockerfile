@@ -14,7 +14,6 @@ COPY ./services/comments ./services/comments
 
 RUN cd /app/services/comments && go mod download
 
-RUN ls -ls 
 RUN CGO_ENABLED=0 GOOS=linux go build -C ./services/comments .
 
 ##
@@ -35,9 +34,4 @@ WORKDIR /
 COPY --from=build-stage /app/services/comments .
 
 EXPOSE 4001
-
-#RUN ls -ls 
-#USER nonroot:nonroot
-
-#RUN chmod +x ./posts
 ENTRYPOINT ["./comments"]

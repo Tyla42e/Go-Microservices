@@ -8,17 +8,14 @@ FROM golang:1.21 AS build-stage
 
 WORKDIR /app
 
-#RUN ls -ls  ./
-
 COPY ./utils/ ./utils
 COPY ./eventtypes ./eventtypes
 COPY ./services/eventbus ./services/eventbus
 
 RUN cd /app/services/eventbus && go mod download
 
-RUN ls -ls 
 RUN CGO_ENABLED=0 GOOS=linux go build -C ./services/eventbus .
-#RUN ls -ls  ./services/eventbus
+
 ##
 ## Run the tests in the container
 ##
@@ -37,9 +34,4 @@ WORKDIR /
 COPY --from=build-stage /app/services/eventbus .
 
 EXPOSE 4005
-
-#RUN ls -ls 
-#USER nonroot:nonroot
-
-#RUN chmod +x ./posts
 ENTRYPOINT ["./eventbus"]

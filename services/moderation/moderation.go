@@ -56,7 +56,7 @@ func handleEvent(context *gin.Context) {
 
 		event.EventType = eventtypes.CommentModerated.String()
 		logger.Info().Msgf("Sending event: %+v\n", event)
-		req, err := utils.CreateHTTPRequest("POST", "http://localhost", "4005", "events", event)
+		req, err := utils.CreateHTTPRequest("POST", "http://eventbus-srv", "4005", "events", event)
 
 		if err != nil {
 			logger.Error().Err(err).Msg("Error Creating Request")
@@ -66,7 +66,7 @@ func handleEvent(context *gin.Context) {
 				if res != nil {
 					logger.Error().Err(err).Msg(res.Status)
 				} else {
-					logger.Error().Err(err).Msg("Unable to connect to http://localhost:4005/events")
+					logger.Error().Err(err).Msg("Unable to connect to http://eventbus-srv:4005/events")
 				}
 			} else {
 				logger.Info().Msg(res.Status)

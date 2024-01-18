@@ -77,7 +77,7 @@ func addComment(context *gin.Context) {
 	event.Payload = comment
 	event.Payload.Status = "pending"
 
-	req, err := utils.CreateHTTPRequest("POST", "http://localhost", "4005", "events", event)
+	req, err := utils.CreateHTTPRequest("POST", "http://eventbus-srv", "4005", "events", event)
 
 	if err != nil {
 		logger.Error().Err(err).Msg("Error Creating Request")
@@ -87,7 +87,7 @@ func addComment(context *gin.Context) {
 			if res != nil {
 				logger.Error().Err(err).Msg(res.Status)
 			} else {
-				logger.Error().Err(err).Msg("Unable to connect to http://localhost:4005/events")
+				logger.Error().Err(err).Msg("Unable to connect to http://eventbus-srv:4005/events")
 			}
 		} else {
 			logger.Info().Msg(res.Status)
@@ -119,18 +119,23 @@ func handleEvent(context *gin.Context) {
 			context.JSON(http.StatusBadRequest, gin.H{"message": err})
 			return
 		}
-		req, err := utils.CreateHTTPRequest("POST", "http://localhost", "4005", "events", event)
+		req, err := utils.CreateHTTPRequest("POST", "http://eventbus-srv", "4005", "events", event)
 
 		if err != nil {
 			logger.Error().Err(err).Msg("Error Creating Request")
 		} else {
-			res, err := utils.DispatchRequest(req)
+			res, err := http.DefaultClient.Do(req)
 			if err != nil {
-				logger.Error().Err(err).Msg(res.Status)
+				if res != nil {
+					logger.Error().Err(err).Msg(res.Status)
+				} else {
+					logger.Error().Err(err).Msg("Unable to connect to http://eventbus-srv:4005/events")
+				}
 			} else {
 				logger.Info().Msg(res.Status)
 			}
 		}
+
 	}
 	context.JSON(http.StatusCreated, gin.H{"message": "OK"})
 }
