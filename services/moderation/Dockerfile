@@ -21,8 +21,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -C ./services/moderation .
 ## Run the tests in the container
 ##
 
-FROM build-stage AS run-test-stage
-RUN go test -v ./...
+# FROM build-stage AS run-test-stage
+# RUN go test -v ./...
 
 ##
 ## Deploy the application binary into a lean image

@@ -46,7 +46,7 @@ build:
           - src: "*.go"
             dest: .
       docker:
-        dockerfile: /services/posts/Dockerfile
+        dockerfile: ./services/posts/Dockerfile
     - image: tyla42e/query
       context: .
       sync:
@@ -54,4 +54,4 @@ build:
           - src: "*.go"
             dest: .
       docker:
-        dockerfile: /services/query/Dockerfile
+        dockerfile: ./services/query/Dockerfile
