@@ -1,6 +1,6 @@
-POST http://192.168.59.100:30288/posts/de2683d3/comments
+POST http://mywibbleposts.com/posts/472a6de1/comments
 Content-Type: application/json
 
 {
-    "Context": "Comment 1"
+    "context": "Comment 1"
 }

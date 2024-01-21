@@ -34,11 +34,11 @@ func main() {
 	server := gin.Default()
 
 	server.Use(cors.Default())
-	server.GET("/posts", getPosts)
+	//server.GET("/posts", getPosts)
 	server.POST("/posts/create", addPost)
 	server.POST("/events", handleEvent)
 
-	logger.Info().Msg("Starting POST Service v42")
+	logger.Info().Msg("Starting POST Service v666")
 	server.Run(":4000")
 }
 

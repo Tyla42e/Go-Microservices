@@ -7,7 +7,7 @@ const PostList = () => {
   const [posts, setPosts] = useState({});
 
   const fetchPosts = async () => {
-    const res = await axios.get("http://posts.com/posts");
+    const res = await axios.get("http://mywibbleposts.com/posts");
     console.log(res.data)
     setPosts(res.data);
   };

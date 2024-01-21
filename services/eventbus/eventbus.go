@@ -35,7 +35,7 @@ func main() {
 	server := gin.Default()
 
 	server.Use(cors.Default())
-	server.GET("/", getAllEvents)
+	//server.GET("/", getAllEvents)
 	server.POST("/events", handleEvents)
 	server.GET("/events", getAllEvents)
 	server.Run(":4005")

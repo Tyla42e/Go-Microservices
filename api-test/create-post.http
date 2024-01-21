@@ -1,6 +1,6 @@
-POST http://192.168.59.100:30288/posts/create
+POST http://192.168.59.100:32367/posts/create
 Content-Type: application/json
 
 {
-    "Title": "Post 3"
+    "Title": "Post 1"
 }
