@@ -18,7 +18,7 @@ var logger zerolog.Logger
 func main() {
 
 	file, err := os.OpenFile(
-		"../logs/eventbus.log",
+		"/var/log/eventbus.log",
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 		0664,
 	)
@@ -29,10 +29,13 @@ func main() {
 	defer file.Close()
 
 	//gin.DefaultWriter = io.MultiWriter(file)
-	logger = zerolog.New(file).With().Caller().Timestamp().Logger()
+	//logger = zerolog.New(file).With().Caller().Timestamp().Logger()
+
+	logger = zerolog.New(os.Stdout).With().Caller().Timestamp().Logger()
 	server := gin.Default()
 
 	server.Use(cors.Default())
+	//server.GET("/", getAllEvents)
 	server.POST("/events", handleEvents)
 	server.GET("/events", getAllEvents)
 	server.Run(":4005")
@@ -59,10 +62,10 @@ func handleEvents(context *gin.Context) {
 	event.Save()
 
 	logger.Info().Msg("Forwarding Requests")
-	forwardRequest("POST", "http://localhost:4000/events", event)
-	forwardRequest("POST", "http://localhost:4001/events", event)
-	forwardRequest("POST", "http://localhost:4002/events", event)
-	forwardRequest("POST", "http://localhost:4003/events", event)
+	forwardRequest("POST", "http://post-clusterip-srv:4000/events", event)
+	forwardRequest("POST", "http://comments-clusterip-srv:4001/events", event)
+	forwardRequest("POST", "http://query-clusterip-srv:4002/events", event)
+	forwardRequest("POST", "http://moderation-clusterip-srv:4003/events", event)
 
 	context.JSON(http.StatusCreated, gin.H{"message": "OK"})
 }

@@ -1,0 +1,6 @@
+POST http://mywibbleposts.com/posts/472a6de1/comments
+Content-Type: application/json
+
+{
+    "context": "Comment 1"
+}

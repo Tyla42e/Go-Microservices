@@ -1,0 +1,57 @@
+apiVersion: skaffold/v4beta3
+kind: Config
+manifests:
+  rawYaml:
+    - ./infra/k8s/*
+build:
+  local:
+    push: false
+  artifacts:
+    - image: tyla42e/client
+      context: client
+      sync:
+        manual:
+          - src: src/**/*.js
+            dest: .
+      docker:
+        dockerfile: Dockerfile
+    - image: tyla42e/comments
+      context: .
+      sync:
+        manual:
+          - src: "*.go"
+            dest: .
+      docker:
+        dockerfile: ./services/comments/Dockerfile
+    - image: tyla42e/eventbus
+      context: .
+      sync:
+        manual:
+          - src: "*.go"
+            dest: .
+      docker:
+        dockerfile: ./services/eventbus/Dockerfile
+    - image: tyla42e/moderation
+      context: .
+      sync:
+        manual:
+          - src: "*.go"
+            dest: .
+      docker:
+        dockerfile: ./services/moderation/Dockerfile
+    - image: tyla42e/posts
+      context: .
+      sync:
+        manual:
+          - src: "*.go"
+            dest: .
+      docker:
+        dockerfile: ./services/posts/Dockerfile
+    - image: tyla42e/query
+      context: .
+      sync:
+        manual:
+          - src: "*.go"
+            dest: .
+      docker:
+        dockerfile: ./services/query/Dockerfile

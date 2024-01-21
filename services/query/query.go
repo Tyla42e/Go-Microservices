@@ -25,7 +25,7 @@ var logger zerolog.Logger
 func main() {
 
 	file, err := os.OpenFile(
-		"../logs/query.log",
+		"/var/log/query.log",
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 		0664,
 	)
@@ -36,7 +36,8 @@ func main() {
 	defer file.Close()
 
 	//gin.DefaultWriter = io.MultiWriter(file)
-	logger = zerolog.New(file).With().Caller().Timestamp().Logger()
+	//logger = zerolog.New(file).With().Caller().Timestamp().Logger()
+	logger = zerolog.New(os.Stdout).With().Caller().Timestamp().Logger()
 
 	server := gin.Default()
 
@@ -64,7 +65,7 @@ func processMissedEvents() {
 
 	var missedEvents = []models.Event{}
 
-	resp, err := http.Get("http://localhost:4005/events")
+	resp, err := http.Get("http://eventbus-srv:4005/events")
 
 	if err != nil {
 		logger.Error().Err(err)
