@@ -11,6 +11,7 @@ import (
 	"example.com/query/models"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/nats-io/nats.go"
 	"github.com/rs/zerolog"
 )
 
@@ -21,6 +22,7 @@ var m = map[string]interface{}{
 }
 
 var logger zerolog.Logger
+var postChanRecv chan *models.Event
 
 func main() {
 
@@ -43,9 +45,23 @@ func main() {
 
 	server.Use(cors.Default())
 
-	server.POST("/events", handleEvent)
+	//server.POST("/events", handleEvent)
 	server.GET("/posts", getAllPosts)
+	nc, err := nats.Connect("nats-srv")
+	if err != nil {
+		panic(err)
+	}
 
+	ec, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+	if err != nil {
+		panic(err)
+	}
+	defer ec.Close()
+
+	logger.Info().Msg("Connected to NATS and ready to send messages")
+
+	postChanSend := make(chan *models.Event)
+	ec.BindSendChan("post:created", postChanSend)
 	listener, err := net.Listen("tcp", ":4002")
 	if err != nil {
 		logger.Fatal().Msg("Failed to creat listener")
@@ -120,6 +136,9 @@ func handlePostCreated(event models.Event) {
 	logger.Info().Msg("handlePostCreated")
 	logger.Info().Msgf("Event: %+v", event)
 
+	req := <-postChanRecv
+
+	logger.Info().Msgf("Received request: %+v", req)
 	var post models.Post
 	jsonData, _ := json.Marshal(event.Payload)
 	json.Unmarshal(jsonData, &post)
@@ -138,6 +157,7 @@ func handleCommentCreated(event models.Event) {
 }
 
 func handleCommentUpdated(event models.Event) {
+
 	logger.Info().Msg("handleCommentUpdated")
 	logger.Info().Msgf("Event: %+v", event)
 

@@ -10,10 +10,12 @@ import (
 	"example.com/utils"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/nats-io/nats.go"
 	"github.com/rs/zerolog"
 )
 
 var logger zerolog.Logger
+var postChanSend chan *models.PostEvent
 
 func main() {
 
@@ -34,17 +36,27 @@ func main() {
 	server := gin.Default()
 
 	server.Use(cors.Default())
-	//server.GET("/posts", getPosts)
+
 	server.POST("/posts/create", addPost)
 	server.POST("/events", handleEvent)
 
+	nc, err := nats.Connect("nats-srv")
+	if err != nil {
+		panic(err)
+	}
+
+	ec, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+	if err != nil {
+		panic(err)
+	}
+	defer ec.Close()
+
+	logger.Info().Msg("Connected to NATS and ready to send messages")
+
+	postChanSend := make(chan *models.PostEvent)
+	ec.BindSendChan("post:created", postChanSend)
 	logger.Info().Msg("Starting POST Service v666")
 	server.Run(":4000")
-}
-
-func getPosts(context *gin.Context) {
-	posts := models.GetAllPosts()
-	context.JSON(http.StatusOK, posts)
 }
 
 func addPost(context *gin.Context) {
@@ -74,23 +86,24 @@ func addPost(context *gin.Context) {
 	event.Payload = post
 
 	logger.Info().Msgf("Sending event: %+v", event)
-	req, err := utils.CreateHTTPRequest("POST", "http://eventbus-srv", "4005", "events", event)
+	// req, err := utils.CreateHTTPRequest("POST", "http://eventbus-srv", "4005", "events", event)
 
-	if err != nil {
-		logger.Error().Err(err).Msg("Error Creating Request")
-	} else {
-		res, err := http.DefaultClient.Do(req)
-		if err != nil {
-			if res != nil {
-				logger.Error().Err(err).Msg(res.Status)
-			} else {
-				logger.Error().Err(err).Msg("Unable to connect to http://eventbus-srv:4005/events")
-			}
-		} else {
-			logger.Info().Msg(res.Status)
-		}
-	}
+	// if err != nil {
+	// 	logger.Error().Err(err).Msg("Error Creating Request")
+	// } else {
+	// 	res, err := http.DefaultClient.Do(req)
+	// 	if err != nil {
+	// 		if res != nil {
+	// 			logger.Error().Err(err).Msg(res.Status)
+	// 		} else {
+	// 			logger.Error().Err(err).Msg("Unable to connect to http://eventbus-srv:4005/events")
+	// 		}
+	// 	} else {
+	// 		logger.Info().Msg(res.Status)
+	// 	}
+	// }
 
+	postChanSend <- &event
 	context.JSON(http.StatusCreated, gin.H{"message": "Post Created!", "post": post})
 }
 
